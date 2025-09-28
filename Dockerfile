@@ -1,11 +1,15 @@
 FROM php:8.2-apache
 
-# SQLite + PDO
-RUN apt-get update && apt-get install -y zlib1g-dev libzip-dev \
-  && rm -rf /var/lib/apt/lists/* \
-  && docker-php-ext-install pdo pdo_sqlite
+# Required libs for pdo_sqlite (+ useful zlib/zip); also need pkg-config
+RUN apt-get update && apt-get install -y \
+    libsqlite3-dev \
+    pkg-config \
+    zlib1g-dev \
+    libzip-dev \
+  && docker-php-ext-install pdo pdo_sqlite \
+  && rm -rf /var/lib/apt/lists/*
 
-# Allow .htaccess + rewrites
+# Enable rewrites and allow .htaccess overrides
 RUN a2enmod rewrite \
   && sed -i 's/AllowOverride None/AllowOverride All/g' /etc/apache2/apache2.conf
 
